@@ -21,6 +21,8 @@ export default class Cl_cEstudiantes {
     this.vista = vista;
     this.volverCallback = volverCallback;
     this.vista.onAgregar(() => this.onAgregar());
+    this.vista.onModificar(() => this.onModificar());
+    this.vista.onEliminar(() => this.onEliminar());
     this.vista.onVolver(() => this.onVolver());
     this.vista.mostrar();
     this.cargarEstudiantes();
@@ -44,6 +46,52 @@ export default class Cl_cEstudiantes {
       alert(resultado.mensaje);
       if (resultado.ok) this.cargarEstudiantes();
     });
+  }
+
+  private async onModificar() {
+    const tablaId = this.vista.cedula;
+    if (!tablaId) {
+      alert("Ingrese una cédula válida");
+      return;
+    }
+    const existe = await sEstudiantes.existe(tablaId);
+    if (existe.ok === false) {
+      alert("Error: No se pudo conectar con el servidor");
+      return;
+    }
+    if (!existe.existe) {
+      alert("No existe un estudiante registrado con esa cédula");
+      return;
+    }
+    if (
+      !confirm("Confirma modificar el estudiante con cédula " + tablaId + "?")
+    )
+      return;
+
+    const estudiante = new Cl_mEstudiante({
+      cedula: tablaId,
+      nombre: this.vista.nombre,
+    });
+    const resultado = await sEstudiantes.modificar(
+      tablaId,
+      estudiante.toJSON(),
+    );
+    alert(resultado.mensaje);
+    if (resultado.ok) this.cargarEstudiantes();
+  }
+
+  private async onEliminar() {
+    const tablaId = this.vista.cedula;
+    if (!tablaId) {
+      alert("Ingrese una cédula válida");
+      return;
+    }
+    if (!confirm("Confirma eliminar el estudiante con cédula " + tablaId + "?"))
+      return;
+
+    const resultado = await sEstudiantes.eliminar(tablaId);
+    alert(resultado.mensaje);
+    if (resultado.ok) this.cargarEstudiantes();
   }
 
   private onVolver() {

@@ -7,6 +7,8 @@ export default class Cl_vEstudiantes implements I_vEstudiantes {
   inNombre: HTMLInputElement;
   btAgregar: HTMLButtonElement;
   btVolver: HTMLButtonElement;
+  btModificar: HTMLButtonElement;
+  btEliminar: HTMLButtonElement;
   tblRegistros: HTMLTableSectionElement;
 
   constructor() {
@@ -19,6 +21,12 @@ export default class Cl_vEstudiantes implements I_vEstudiantes {
     ) as HTMLInputElement;
     this.btAgregar = document.getElementById(
       "estudiantes_btAgregar",
+    ) as HTMLButtonElement;
+    this.btModificar = document.getElementById(
+      "estudiantes_btModificar",
+    ) as HTMLButtonElement;
+    this.btEliminar = document.getElementById(
+      "estudiantes_btEliminar",
     ) as HTMLButtonElement;
     this.btVolver = document.getElementById(
       "estudiantes_btVolver",
@@ -38,6 +46,14 @@ export default class Cl_vEstudiantes implements I_vEstudiantes {
 
   onAgregar(callback: () => void): void {
     this.btAgregar.onclick = callback;
+  }
+
+  onModificar(callback: () => void): void {
+    this.btModificar.onclick = callback;
+  }
+
+  onEliminar(callback: () => void): void {
+    this.btEliminar.onclick = callback;
   }
 
   onVolver(callback: () => void): void {

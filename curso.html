@@ -49,7 +49,11 @@
       <label>Nombre:
         <input type="text" id="estudiantes_inNombre" placeholder="Nombre del estudiante">
       </label>
-      <button id="estudiantes_btAgregar">Agregar</button>
+      <div style="display:flex; gap:6px; margin-top:6px;">
+        <button id="estudiantes_btAgregar">Agregar</button>
+        <button id="estudiantes_btModificar">Modificar</button>
+        <button id="estudiantes_btEliminar">Eliminar</button>
+      </div>
     </div>
     <table style="text-align: center;margin-top: 10px; border: 1px solid #ccc;">
       <thead>
@@ -70,7 +74,7 @@
 
     const vCurso = new Cl_vCurso();
 
-    new Cl_cCurso({vista: vCurso });
+    new Cl_cCurso({ vista: vCurso });
   </script>
 </body>
 

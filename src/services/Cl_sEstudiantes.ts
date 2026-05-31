@@ -1,26 +1,40 @@
 import Cl_mEstudiante from "../models/Cl_mEstudiante.js";
-import mockapi from "../services/Cl_sMockApi.js";
+import Cl_sProyecto from "./Cl_sProyecto.js";
 
-export default class Cl_sEstudiantes {
+export default class Cl_sEstudiantes extends Cl_sProyecto {
   static async existe(
-    cedula: number,
+    tablaId: number,
   ): Promise<{ ok: boolean; existe: boolean }> {
-    const result = await mockapi.existeId({ tabla: "estudiante", id: cedula });
-    return result;
+    return super.existeId({
+      tabla: "estudiante",
+      tablaId,
+      tablaIdName: "cedula",
+    });
   }
 
   static async agregar(
     nuevoEstudiante: Cl_mEstudiante,
   ): Promise<{ ok: boolean; mensaje: string }> {
-    const result = await mockapi.post(nuevoEstudiante.toJSON());
-    return result;
+    return super.agregar(nuevoEstudiante.toJSON());
+  }
+
+  static async modificar(
+    tablaId: number,
+    datos: any,
+  ): Promise<{ ok: boolean; mensaje: string }> {
+    return super.modificar(tablaId, datos, "cedula");
+  }
+
+  static async eliminar(
+    tablaId: number,
+  ): Promise<{ ok: boolean; mensaje: string }> {
+    return super.eliminar(tablaId, "estudiante", "cedula");
   }
 
   static async getEstudiantes(): Promise<{
     ok: boolean;
     tabla: Cl_mEstudiante[];
   }> {
-    let entregas = mockapi.getTabla({ tabla: "estudiante" });
-    return entregas;
+    return super.getTabla({ tabla: "estudiante" });
   }
 }
