@@ -3,11 +3,11 @@ import Cl_sProyecto from "./Cl_sProyecto.js";
 
 export default class Cl_sEstudiantes extends Cl_sProyecto {
   static async existe(
-    tablaId: number,
+    estudianteId: number,
   ): Promise<{ ok: boolean; existe: boolean }> {
     return super.existeId({
       tabla: "estudiante",
-      tablaId,
+      tablaId: estudianteId,
       tablaIdName: "cedula",
     });
   }
@@ -19,16 +19,16 @@ export default class Cl_sEstudiantes extends Cl_sProyecto {
   }
 
   static async modificar(
-    tablaId: number,
+    estudianteId: number,
     datos: any,
   ): Promise<{ ok: boolean; mensaje: string }> {
-    return super.modificar(tablaId, datos, "cedula");
+    return super.modificar(estudianteId, datos, "cedula");
   }
 
   static async eliminar(
-    tablaId: number,
+    estudianteId: number,
   ): Promise<{ ok: boolean; mensaje: string }> {
-    return super.eliminar(tablaId, "estudiante", "cedula");
+    return super.eliminar(estudianteId, "estudiante", "cedula");
   }
 
   static async getEstudiantes(): Promise<{

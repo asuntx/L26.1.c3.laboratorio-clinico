@@ -9,11 +9,11 @@ export default class Cl_sQuiz extends Cl_sProyecto {
   }
 
   static async existe(
-    tablaId: number,
+    quizId: number,
   ): Promise<{ ok: boolean; existe: boolean }> {
     return super.existeId({
       tabla: "quiz",
-      tablaId,
+      tablaId: quizId,
       tablaIdName: "cedula",
     });
   }
