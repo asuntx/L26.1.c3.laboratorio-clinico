@@ -1,5 +1,5 @@
 export default class Cl_sMockApi {
-  protected static apiUrl: string = "";
+  protected static apiUrl: string = "https://6a25b8a65447714a6f83aa15.mockapi.io/lab/api/v1/";
 
   protected static async fetchMockApi({
     method = "GET",
@@ -53,7 +53,7 @@ export default class Cl_sMockApi {
     ok: boolean;
     tabla: any[];
   }> {
-    const uri = `${this.apiUrl}?tabla=${tabla}`;
+    const uri = `${this.apiUrl}${tabla}`;
     const respuesta = await this.fetchMockApi({ method: "GET", uri });
 
     if (respuesta.status === 404) {
@@ -76,7 +76,7 @@ export default class Cl_sMockApi {
     tablaId: number;
     tablaIdName: string;
   }): Promise<{ ok: boolean; existe: boolean }> {
-    const uri = `${this.apiUrl}?tabla=${tabla}&${tablaIdName}=${tablaId}`;
+    const uri = `${this.apiUrl}${tabla}?${tablaIdName}=${tablaId}`;
     const respuesta = await this.fetchMockApi({ method: "GET", uri });
 
     // ¡El truco para domar a MockAPI!
@@ -99,12 +99,14 @@ export default class Cl_sMockApi {
 
   static async agregar(
     registro: any,
-  ): Promise<{ ok: boolean; mensaje: string }> {
-    const uri = this.apiUrl;
+  ): Promise<{ ok: boolean; mensaje: string; tabla?: any }> {
+    const tabla = registro?.tabla;
+    const uri = tabla ? `${this.apiUrl}${tabla}` : this.apiUrl;
+    const { tabla: _t, ...body } = registro; // no enviar 'tabla' al API
     const respuesta = await this.fetchMockApi({
       method: "POST",
       uri,
-      body: registro,
+      body,
     });
 
     if (!respuesta.ok) {
@@ -114,95 +116,28 @@ export default class Cl_sMockApi {
     return {
       ok: true,
       mensaje: "Registro guardado con ID: " + (respuesta.data?.id ?? ""),
+      tabla: respuesta.data
     };
   }
 
-  private static async obtenerIdMockApi({
-    tabla,
-    tablaId,
-    tablaIdName,
-  }: {
-    tabla: string;
-    tablaId: number;
-    tablaIdName: string;
-  }): Promise<string | undefined> {
-    const uri = `${this.apiUrl}?tabla=${tabla}&${tablaIdName}=${tablaId}`;
-    return this.fetchMockApi({ method: "GET", uri }).then((respuesta) => {
-      if (respuesta.status === 404 || !respuesta.ok) {
-        return undefined;
-      }
-
-      if (!Array.isArray(respuesta.data) || respuesta.data.length === 0) {
-        return undefined;
-      }
-
-      // Filtrar EXACTAMENTE por el valor de tablaId para evitar coincidencias parciales
-      const registroExacto = respuesta.data.find(
-        (item: any) => item[tablaIdName] === tablaId
-      );
-
-      return registroExacto?.id;
-    });
-  }
-
   static async modificar(
-    tablaId: number,
-    registro: any,
-    tablaIdName: string,
+    mockApiId: string,
+    tabla: string,
+    cambios: Record<string, unknown>,
   ): Promise<{ ok: boolean; mensaje: string }> {
-    const tabla = registro?.tabla;
-    const recursoId = tabla
-      ? await this.obtenerIdMockApi({ tabla, tablaId, tablaIdName })
-      : undefined;
-
-    if (!recursoId) {
-      return {
-        ok: false,
-        mensaje:
-          "No se encontró el registro en MockAPI para modificar con ese tablaId",
-      };
-    }
-
-    const uri = `${this.apiUrl}/${recursoId}`;
-    const respuesta = await this.fetchMockApi({
-      method: "PUT",
-      uri,
-      body: registro,
-    });
-
-    if (!respuesta.ok) {
-      return { ok: false, mensaje: "Error al modificar el registro" };
-    }
-
+    const uri = `${this.apiUrl}${tabla}/${mockApiId}`;
+    const respuesta = await this.fetchMockApi({ method: "PUT", uri, body: cambios });
+    if (!respuesta.ok) return { ok: false, mensaje: "Error al modificar" };
     return { ok: true, mensaje: "Registro modificado" };
   }
 
   static async eliminar(
-    tablaId: number,
+    mockApiId: string,
     tabla: string,
-    tablaIdName: string,
   ): Promise<{ ok: boolean; mensaje: string }> {
-    const recursoId = await this.obtenerIdMockApi({
-      tabla,
-      tablaId,
-      tablaIdName,
-    });
-
-    if (!recursoId) {
-      return {
-        ok: false,
-        mensaje:
-          "No se encontró el registro en MockAPI para eliminar con ese tablaId",
-      };
-    }
-
-    const uri = `${this.apiUrl}/${recursoId}`;
+    const uri = `${this.apiUrl}${tabla}/${mockApiId}`;
     const respuesta = await this.fetchMockApi({ method: "DELETE", uri });
-
-    if (!respuesta.ok) {
-      return { ok: false, mensaje: "Error al eliminar el registro" };
-    }
-
+    if (!respuesta.ok) return { ok: false, mensaje: "Error al eliminar" };
     return { ok: true, mensaje: "Registro eliminado" };
   }
 }
